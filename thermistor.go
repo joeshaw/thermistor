@@ -124,7 +124,7 @@ func main() {
 					log.Printf("A%d resistance: %f", i, r)
 
 					// Steinhart-Hart equation
-					tc := 1/(math.Log(r/refr)/beta+1/(reft+273.15)) - 275.15
+					tc := 1/(math.Log(r/refr)/beta+1/(reft+273.15)) - 273.15
 
 					// Fahrenheit for display
 					tf := tc*9/5 + 32
