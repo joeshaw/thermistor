@@ -1,0 +1,11 @@
+[Unit]
+Description=thermistor
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/thermistor
+User=pi
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
