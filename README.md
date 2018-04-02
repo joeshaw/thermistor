@@ -15,6 +15,8 @@ to announce accessories and services to HomeKit.
 
 ![The finished product](thermistor-rpi.jpg)
 
+![Values in the Home app](thermistor-ios.jpg)
+
 This code is specific to our implementation and probably not very
 useful, but can be a decent example of how to use Gobot, HomeControl,
 the ADS1015 ADC, and calculating temperatures from thermistors in
