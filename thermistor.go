@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"math"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
@@ -11,6 +13,9 @@ import (
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/service"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/raspi"
@@ -82,6 +87,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	gauge := promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "thermistor_temperature",
+		Help: "Current thermistor temperature in Fahrenheit.",
+	},
+		[]string{"number"},
+	)
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -131,8 +143,37 @@ func main() {
 					log.Printf("A%d temperature: %f", i, tf)
 
 					sensors[i].CurrentTemperature.SetValue(tc)
+					gauge.WithLabelValues(fmt.Sprint(i)).Set(tf)
 				}
 			}
+		}
+	}()
+
+	go func() {
+		mux := http.NewServeMux()
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, "/metrics", http.StatusMovedPermanently)
+		})
+		mux.Handle("/metrics", promhttp.Handler())
+
+		log.Printf("Starting Prometheus exporter on :9526")
+
+		s := http.Server{
+			Addr:    ":9526",
+			Handler: mux,
+		}
+
+		go func() {
+			<-ctx.Done()
+			s.Shutdown(context.Background())
+		}()
+
+		if err := s.ListenAndServe(); err != nil {
+			if err == http.ErrServerClosed {
+				return
+			}
+
+			log.Fatalf("cannot start Prometheus exporter: %v", err)
 		}
 	}()
 
