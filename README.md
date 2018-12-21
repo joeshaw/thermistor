@@ -8,11 +8,11 @@ to install a Nest thermostat instead, which can't use these.
 We took a Raspberry Pi and an [ADS1015 I2C 12-bit analog-to-digital
 converter](https://www.adafruit.com/product/1083) and connected the
 two thermistors to it.  We do a little math and report the detected
-temperatures as a temperature sensor accessory with two services in
-Apple HomeKit.  The code is in Go, uses [Gobot](https://gobot.io) for
-interfacing with the ADS1015 over the I2C bus and implements the
-HomeKit Application Protocol with
-[HomeControl](https://github.com/brutella/hc).
+temperatures as a temperature sensor accessory with two services to
+Apple HomeKit, and expose the values as a Prometheus exporter.  The 
+code is in Go, uses [Gobot](https://gobot.io) for interfacing with 
+the ADS1015 over the I2C bus and implements the HomeKit Accessory 
+Protocol with [HomeControl](https://github.com/brutella/hc).
 
 ![The finished product](thermistor-rpi.jpg)
 
@@ -20,8 +20,8 @@ HomeKit Application Protocol with
 
 This code is specific to our implementation and probably not very
 useful, but can be a decent example of how to use Gobot, HomeControl,
-the ADS1015 ADC, and calculating temperatures from thermistors in
-general.
+Prometheus, the ADS1015 ADC, and calculating temperatures from
+thermistors in general.
 
 ### Build
 
